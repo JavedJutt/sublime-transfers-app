@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    # freezed/riverpod codegen annotate fields in ways the analyzer flags spuriously.
+    invalid_annotation_target: ignore
+
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_print
+    - prefer_single_quotes
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_locals
+    - unawaited_futures
+    - use_super_parameters
+    - require_trailing_commas
+    - sort_child_properties_last
+    - unnecessary_parenthesis
+    - directives_ordering
