@@ -1,9 +1,21 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/design/app_icons.dart';
 import '../../data/models/app_user.dart';
 import '../../data/models/user_role.dart';
+import '../../features/admin/presentation/admin_placeholder_screen.dart';
+import '../../features/admin/presentation/admin_shell.dart';
+import '../../features/admin/presentation/calendar_screen.dart';
+import '../../features/admin/presentation/dashboard_screen.dart';
+import '../../features/admin/presentation/driver_approvals_screen.dart';
+import '../../features/admin/presentation/driver_detail_screen.dart';
+import '../../features/admin/presentation/drivers_screen.dart';
+import '../../features/admin/presentation/ride_detail_screen.dart';
+import '../../features/admin/presentation/ride_form_screen.dart';
+import '../../features/admin/presentation/ride_list_screen.dart';
 import '../../features/auth/presentation/driver_register_screen.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/pending_approval_screen.dart';
@@ -13,6 +25,12 @@ import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/dev/component_gallery_screen.dart';
 import '../../providers/auth_providers.dart';
 import 'routes.dart';
+
+// Navigator keys. The root key hosts full-screen routes (ride form/detail,
+// driver detail/approvals) that push *over* the admin shell; the shell key
+// hosts the tabbed content inside the nav chrome.
+final _rootKey = GlobalKey<NavigatorState>();
+final _shellKey = GlobalKey<NavigatorState>();
 
 /// The app router with a single role-aware redirect.
 ///
@@ -24,6 +42,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ref.watch(routerRefreshProvider);
 
   return GoRouter(
+    navigatorKey: _rootKey,
     initialLocation: R.splash,
     refreshListenable: refresh,
     debugLogDiagnostics: kDebugMode,
@@ -58,6 +77,88 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           path: R.components,
           builder: (_, _) => const ComponentGalleryScreen(),
         ),
+
+      // -------------------------------------------------------------- admin
+      // The shell provides the responsive nav chrome; child routes render into
+      // it. Ride create/edit/detail are pushed on top (full-screen) rather than
+      // nested in the shell, so the form and detail get their own app bar.
+      ShellRoute(
+        navigatorKey: _shellKey,
+        builder: (context, state, child) => AdminShell(child: child),
+        routes: [
+          GoRoute(
+            path: R.adminDashboard,
+            builder: (_, _) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: R.adminCalendar,
+            builder: (_, _) => const CalendarScreen(),
+          ),
+          GoRoute(
+            path: R.adminRides,
+            builder: (_, _) => const RideListScreen(),
+          ),
+          GoRoute(
+            path: R.adminLiveMap,
+            builder: (_, _) => const AdminPlaceholderScreen(
+              title: 'Live map',
+              phase: 'the live-monitoring phase',
+              icon: AppIcons.liveMap,
+            ),
+          ),
+          GoRoute(
+            path: R.adminDrivers,
+            builder: (_, _) => const DriversScreen(),
+            routes: [
+              // Nested under /admin/drivers; `approvals` before `:driverId`.
+              GoRoute(
+                path: 'approvals',
+                parentNavigatorKey: _rootKey,
+                builder: (_, _) => const DriverApprovalsScreen(),
+              ),
+              GoRoute(
+                path: ':driverId',
+                parentNavigatorKey: _rootKey,
+                builder: (_, state) =>
+                    DriverDetailScreen(driverId: state.pathParameters['driverId']!),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: R.adminReview,
+            builder: (_, _) => const AdminPlaceholderScreen(
+              title: 'Review queue',
+              phase: 'the Gmail ingestion phase',
+              icon: AppIcons.reviewQueue,
+            ),
+          ),
+          GoRoute(
+            path: R.adminGmail,
+            builder: (_, _) => const AdminPlaceholderScreen(
+              title: 'Gmail settings',
+              phase: 'the Gmail ingestion phase',
+              icon: AppIcons.mailbox,
+            ),
+          ),
+        ],
+      ),
+      // Full-screen admin routes (own app bar, pushed over the shell).
+      // `new` is declared before the `:rideId` route so it matches first and a
+      // ride can never have the id "new".
+      GoRoute(
+        path: R.adminRideNew,
+        builder: (_, _) => const RideFormScreen(),
+      ),
+      GoRoute(
+        path: R.adminRideEdit,
+        builder: (_, state) =>
+            RideFormScreen(rideId: state.pathParameters['rideId']!),
+      ),
+      GoRoute(
+        path: R.adminRideDetail,
+        builder: (_, state) =>
+            RideDetailScreen(rideId: state.pathParameters['rideId']!),
+      ),
     ],
   );
 });
