@@ -12,6 +12,7 @@ import '../../../core/router/routes.dart';
 import '../../../core/utils/date_x.dart';
 import '../../../data/models/ride.dart';
 import '../../../providers/auth_providers.dart';
+import '../../../providers/review_providers.dart';
 import '../../../providers/ride_providers.dart';
 import '../../../shared/widgets/async/async_value_view.dart';
 import '../../../shared/widgets/buttons/app_button.dart';
@@ -23,6 +24,55 @@ import '../../../shared/widgets/feedback/error_state.dart';
 import '../../../shared/widgets/feedback/ride_card_skeleton.dart';
 import '../../../shared/widgets/layout/max_width_body.dart';
 import '../widgets/ride/ride_card.dart';
+
+/// A persistent amber banner shown whenever a connected mailbox is reporting a
+/// sync error. A silent ingestion failure means bookings quietly stop arriving,
+/// so this stays on the dashboard until the mailbox is healthy again.
+class _GmailBanner extends ConsumerWidget {
+  const _GmailBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasError = ref.watch(gmailHasErrorProvider).value ?? false;
+    if (!hasError) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
+      child: Material(
+        color: AppColors.warningTint,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => context.go(R.adminGmail),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Row(
+              children: [
+                const Icon(AppIcons.syncFailed, size: 20, color: AppColors.warning),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('A mailbox has stopped syncing',
+                          style: AppTypography.bodyStrong
+                              .copyWith(color: AppColors.warning)),
+                      Text('Booking emails may not be arriving. Tap to check '
+                          'Gmail settings.',
+                          style: AppTypography.bodySm
+                              .copyWith(color: AppColors.inkBody)),
+                    ],
+                  ),
+                ),
+                const Icon(AppIcons.chevronRight, size: 18, color: AppColors.warning),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// The admin landing page: a greeting, the four key counts as stat callouts,
 /// and today's rides. Every section loads and fails independently — one failed
@@ -74,6 +124,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                   ],
                 ),
+                const _GmailBanner(),
                 SizedBox(height: AppBreakpoints.sectionGap(formFactor)),
                 _StatsRow(formFactor: formFactor),
                 SizedBox(height: AppBreakpoints.sectionGap(formFactor)),

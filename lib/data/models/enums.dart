@@ -135,4 +135,13 @@ enum ParseStatus {
         ParseStatus.rejected => 'rejected',
         ParseStatus.imported => 'imported',
       };
+
+  String get label => switch (this) {
+        ParseStatus.needsReview => 'Needs review',
+        ParseStatus.parsed => 'Auto-created',
+        ParseStatus.rejected => 'Rejected',
+        ParseStatus.imported => 'Imported',
+      };
+
+  bool get isOpen => this == ParseStatus.needsReview;
 }

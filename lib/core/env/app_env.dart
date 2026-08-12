@@ -13,10 +13,10 @@ library;
 class AppEnv {
   const AppEnv._();
 
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  static const String supabaseUrl = String.fromEnvironment('ktmkirodwdwpzjxqwboo', defaultValue: 'https://ktmkirodwdwpzjxqwboo.supabase.co');
 
   static const String supabaseAnonKey =
-      String.fromEnvironment('SUPABASE_ANON_KEY');
+      String.fromEnvironment('sb_publishable_DxgLf96jaKtMWHou0IIygA_xJoQZ5sA', defaultValue: 'sb_publishable_DxgLf96jaKtMWHou0IIygA_xJoQZ5sA');
 
   /// Admin-side map rendering only. The native platforms read their own copy
   /// (Android manifest placeholder / iOS xcconfig); this is for web and for
