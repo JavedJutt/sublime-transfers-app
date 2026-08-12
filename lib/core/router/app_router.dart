@@ -3,16 +3,18 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/design/app_icons.dart';
 import '../../data/models/app_user.dart';
 import '../../data/models/user_role.dart';
-import '../../features/admin/presentation/admin_placeholder_screen.dart';
 import '../../features/admin/presentation/admin_shell.dart';
 import '../../features/admin/presentation/calendar_screen.dart';
 import '../../features/admin/presentation/dashboard_screen.dart';
 import '../../features/admin/presentation/driver_approvals_screen.dart';
 import '../../features/admin/presentation/driver_detail_screen.dart';
 import '../../features/admin/presentation/drivers_screen.dart';
+import '../../features/admin/presentation/gmail_settings_screen.dart';
+import '../../features/admin/presentation/live_map_screen.dart';
+import '../../features/admin/presentation/review_detail_screen.dart';
+import '../../features/admin/presentation/review_queue_screen.dart';
 import '../../features/admin/presentation/ride_detail_screen.dart';
 import '../../features/admin/presentation/ride_form_screen.dart';
 import '../../features/admin/presentation/ride_list_screen.dart';
@@ -23,6 +25,12 @@ import '../../features/auth/presentation/profile_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/dev/component_gallery_screen.dart';
+import '../../features/driver/presentation/active_ride_screen.dart';
+import '../../features/driver/presentation/driver_history_screen.dart';
+import '../../features/driver/presentation/driver_home_screen.dart';
+import '../../features/driver/presentation/driver_offers_screen.dart';
+import '../../features/driver/presentation/driver_ride_detail_screen.dart';
+import '../../features/driver/presentation/driver_shell.dart';
 import '../../providers/auth_providers.dart';
 import 'routes.dart';
 
@@ -31,6 +39,7 @@ import 'routes.dart';
 // hosts the tabbed content inside the nav chrome.
 final _rootKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<NavigatorState>();
+final _driverShellKey = GlobalKey<NavigatorState>();
 
 /// The app router with a single role-aware redirect.
 ///
@@ -100,11 +109,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: R.adminLiveMap,
-            builder: (_, _) => const AdminPlaceholderScreen(
-              title: 'Live map',
-              phase: 'the live-monitoring phase',
-              icon: AppIcons.liveMap,
-            ),
+            builder: (_, _) => const LiveMapScreen(),
           ),
           GoRoute(
             path: R.adminDrivers,
@@ -126,19 +131,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: R.adminReview,
-            builder: (_, _) => const AdminPlaceholderScreen(
-              title: 'Review queue',
-              phase: 'the Gmail ingestion phase',
-              icon: AppIcons.reviewQueue,
-            ),
+            builder: (_, _) => const ReviewQueueScreen(),
           ),
           GoRoute(
             path: R.adminGmail,
-            builder: (_, _) => const AdminPlaceholderScreen(
-              title: 'Gmail settings',
-              phase: 'the Gmail ingestion phase',
-              icon: AppIcons.mailbox,
-            ),
+            builder: (_, _) => const GmailSettingsScreen(),
           ),
         ],
       ),
@@ -158,6 +155,49 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: R.adminRideDetail,
         builder: (_, state) =>
             RideDetailScreen(rideId: state.pathParameters['rideId']!),
+      ),
+      GoRoute(
+        path: R.adminReviewItem,
+        builder: (_, state) =>
+            ReviewDetailScreen(emailId: state.pathParameters['emailId']!),
+      ),
+
+      // ------------------------------------------------------------- driver
+      // Mobile-first shell: a three-tab bottom bar with an offline banner. Ride
+      // detail and the active-ride controls push full-screen over it.
+      ShellRoute(
+        navigatorKey: _driverShellKey,
+        builder: (context, state, child) => DriverShell(child: child),
+        routes: [
+          GoRoute(
+            path: R.driverHome,
+            builder: (_, _) => const DriverHomeScreen(),
+          ),
+          GoRoute(
+            path: R.driverOffers,
+            builder: (_, _) => const DriverOffersScreen(),
+          ),
+          GoRoute(
+            path: R.driverHistory,
+            builder: (_, _) => const DriverHistoryScreen(),
+          ),
+          GoRoute(
+            path: R.driverProfile,
+            builder: (_, _) => const ProfileScreen(),
+          ),
+        ],
+      ),
+      // Full-screen driver routes. `active` is nested so its path resolves, and
+      // both push over the shell with their own app bar.
+      GoRoute(
+        path: R.driverRideDetail,
+        builder: (_, state) =>
+            DriverRideDetailScreen(rideId: state.pathParameters['rideId']!),
+      ),
+      GoRoute(
+        path: R.driverActiveRide,
+        builder: (_, state) =>
+            ActiveRideScreen(rideId: state.pathParameters['rideId']!),
       ),
     ],
   );

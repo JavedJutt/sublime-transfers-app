@@ -54,6 +54,23 @@ class RideRepository {
         return rows.map(Ride.fromMap).toList();
       });
 
+  /// The rides currently in flight, for the live map: a driver is assigned and
+  /// the ride has not closed. Ordered by pickup time so the accompanying list
+  /// reads next-up first. Small by nature (a fleet's worth), so unbounded.
+  Future<List<Ride>> fetchActiveRides() => ErrorMapper.guard(() async {
+        final rows = await _client
+            .from('admin_rides')
+            .select()
+            .inFilter('status', const [
+              'assigned',
+              'en_route',
+              'arrived',
+              'in_progress',
+            ])
+            .order('pickup_at');
+        return rows.map(Ride.fromMap).toList();
+      });
+
   /// A single ride by id.
   Future<Ride> fetchRide(String rideId) => ErrorMapper.guard(() async {
         final row = await _client

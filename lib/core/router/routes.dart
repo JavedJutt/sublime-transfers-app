@@ -37,6 +37,7 @@ abstract final class R {
   static const String driverHome = '/driver';
   static const String driverOffers = '/driver/offers';
   static const String driverHistory = '/driver/history';
+  static const String driverProfile = '/driver/profile';
   static const String driverRideDetail = '/driver/rides/:rideId';
   static const String driverActiveRide = '/driver/rides/:rideId/active';
 

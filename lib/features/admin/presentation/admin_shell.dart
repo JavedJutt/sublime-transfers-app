@@ -10,6 +10,7 @@ import '../../../core/design/app_typography.dart';
 import '../../../core/router/routes.dart';
 import '../../../providers/auth_providers.dart';
 import '../../../providers/driver_providers.dart';
+import '../../../providers/review_providers.dart';
 import '../../../shared/widgets/display/app_avatar.dart';
 import '../../shared/notification_center.dart';
 
@@ -207,6 +208,7 @@ class _NavList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // A badge on the Review + Drivers items when there's work waiting.
     final pending = ref.watch(pendingDriversProvider).value?.length ?? 0;
+    final review = ref.watch(reviewQueueCountProvider).value ?? 0;
 
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.sm),
@@ -214,7 +216,11 @@ class _NavList extends ConsumerWidget {
       itemBuilder: (context, i) {
         final item = destinations[i];
         final selected = i == selectedIndex;
-        final badge = item.path == R.adminDrivers && pending > 0 ? pending : 0;
+        final badge = switch (item.path) {
+          R.adminDrivers when pending > 0 => pending,
+          R.adminReview when review > 0 => review,
+          _ => 0,
+        };
         return _NavTile(
           item: item,
           selected: selected,
