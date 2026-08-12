@@ -49,3 +49,9 @@ ios/Flutter/Secrets.xcconfig
 .env
 .env.local
 dart_define.json
+
+# FVM Version Cache (keep fvm_config.json tracked so the pinned SDK version is shared)
+.fvm/flutter_sdk
+.fvm/versions/
+.fvm/release
+.fvm/version
