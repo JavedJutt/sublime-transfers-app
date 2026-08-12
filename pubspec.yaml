@@ -1,0 +1,74 @@
+name: sublime_transfers
+description: "Sublime Transfers — ride dispatch platform for chauffeur bookings."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management & DI
+  flutter_riverpod: ^3.0.0
+  riverpod_annotation: ^3.0.0
+
+  # Routing
+  go_router: ^17.0.0
+
+  # Models
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
+
+  # Backend
+  supabase_flutter: ^2.9.0
+
+  # Location (native geolocation — not the Maps SDK)
+  geolocator: ^14.0.0
+  permission_handler: ^12.0.0
+
+  # Maps (admin-side rendering only)
+  google_maps_flutter: ^2.10.0
+
+  # Offline outbox + cache
+  sqflite: ^2.4.0
+  path: ^1.9.0
+  connectivity_plus: ^7.0.0
+
+  # UI / design system
+  google_fonts: ^6.3.0
+  phosphor_flutter: ^2.1.0
+  cached_network_image: ^3.4.0
+  shimmer: ^3.0.0
+  flutter_svg: ^2.2.0
+
+  # Formatting & utils
+  intl: ^0.20.0
+  collection: ^1.19.0
+  url_launcher: ^6.3.0
+  uuid: ^4.5.0
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  freezed: ^3.2.0
+  json_serializable: ^6.9.0
+  riverpod_generator: ^3.0.0
+  custom_lint: ^0.8.1
+  riverpod_lint: ^3.0.0
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/illustrations/
